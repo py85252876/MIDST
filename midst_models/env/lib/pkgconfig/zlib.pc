@@ -1,0 +1,13 @@
+prefix=/bigtemp/trv3px/MIDSTModels/midst_models/env
+exec_prefix=/bigtemp/trv3px/MIDSTModels/midst_models/env
+libdir=/bigtemp/trv3px/MIDSTModels/midst_models/env/lib
+sharedlibdir=/bigtemp/trv3px/MIDSTModels/midst_models/env/lib
+includedir=/bigtemp/trv3px/MIDSTModels/midst_models/env/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.2.13
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}

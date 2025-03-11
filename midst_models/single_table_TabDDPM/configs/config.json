@@ -1,0 +1,156 @@
+{
+    "general": {
+        "data_dir": "/bigtemp/trv3px/MIDSTModels/starter_kits/tabddpm_white_box/train/tabddpm_1",
+        "workspace_dir": "/bigtemp/trv3px/MIDSTModels/starter_kits/tabddpm_white_box/train",
+        "sample_prefix": "",
+        "exp_name":"tabddpm_1"
+    },
+    "clustering": {
+        "parent_scale": 1.0,
+        "num_clusters": 50,
+        "clustering_method": "both"
+    },
+    "diffusion": {
+        "d_layers": [
+            512,
+            1024,
+            1024,
+            1024,
+            1024,
+            512
+        ],
+        "dropout": 0.0,
+        "num_timesteps": 2000,
+        "model_type": "mlp",
+        "iterations": 1,
+        "batch_size": 1,
+        "lr": 0.0006,
+        "gaussian_loss_type": "mse",
+        "weight_decay": 1e-05,
+        "scheduler": "cosine"
+    },
+    "name": "trans",
+    "task_type": "regression",
+    "header": "infer",
+    "column_names": [
+        "trans_date",
+        "trans_type",
+        "operation",
+        "amount",
+        "balance",
+        "k_symbol",
+        "bank",
+        "account"
+    ],
+    "num_col_idx": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7
+    ],
+    "cat_col_idx": [],
+    "target_col_idx": [
+        3
+    ],
+    "file_type": "csv",
+    "test_path": null,
+    "column_info": {
+        "0": {},
+        "type": "numerical",
+        "max": 99994199.0,
+        "min": 0.0,
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {}
+    },
+    "train_num": 20000,
+    "test_num": 10000,
+    "idx_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7
+    },
+    "inverse_idx_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7
+    },
+    "idx_name_mapping": {
+        "0": "trans_date",
+        "1": "trans_type",
+        "2": "operation",
+        "3": "amount",
+        "4": "balance",
+        "5": "k_symbol",
+        "6": "bank",
+        "7": "account"
+    },
+    "metadata": {
+        "columns": {
+            "0": {
+                "sdtype": "numerical",
+                "computer_representation": "Float"
+            },
+            "1": {
+                "sdtype": "numerical",
+                "computer_representation": "Integer"
+            },
+            "2": {
+                "sdtype": "numerical",
+                "computer_representation": "Integer"
+            },
+            "3": {
+                "sdtype": "numerical",
+                "computer_representation": "Float"
+            },
+            "4": {
+                "sdtype": "numerical",
+                "computer_representation": "Float"
+            },
+            "5": {
+                "sdtype": "numerical",
+                "computer_representation": "Integer"
+            },
+            "6": {
+                "sdtype": "numerical",
+                "computer_representation": "Integer"
+            },
+            "7": {
+                "sdtype": "numerical",
+                "computer_representation": "Float"
+            }
+        }
+    },
+    "classifier": {
+        "d_layers": [
+            128,
+            256,
+            512,
+            1024,
+            512,
+            256,
+            128
+        ],
+        "lr": 0.0001,
+        "dim_t": 128,
+        "batch_size": 4096,
+        "iterations": 20000
+    }
+}
