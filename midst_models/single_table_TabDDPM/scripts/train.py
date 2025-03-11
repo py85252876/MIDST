@@ -60,7 +60,7 @@ class Trainer:
         t_list = torch.linspace(0, num_timesteps - 1, steps=num_samples, device=self.device).long()
         gradients_l2_list = []
         for k in out_dict:
-                out_dict[k] = out_dict[k].long().to(self.device)
+            out_dict[k] = out_dict[k].long().to(self.device)
         for t in t_list:
             self.optimizer.zero_grad()
             loss_multi, loss_gauss = self.diffusion.updated_loss(x, out_dict,t)
@@ -72,8 +72,6 @@ class Trainer:
             temp_gradient_list = torch.cat(inner_gradient)        
             self.optimizer.zero_grad()
             gradients_l2_list.append(temp_gradient_list)
-        # return torch.cat(gradients_l2_list).unsqueeze(0)
-        # print(torch.stack(gradients_l2_list).shape)
         return torch.stack(gradients_l2_list).mean(dim=0).unsqueeze(0)
 
     def run_loop(self):
@@ -116,19 +114,16 @@ class Trainer:
 
             step += 1
     
-    def gradient_loop(self):
+    def gradient_loop(self, gradient_settings = None):
         step = 0
         gradient_list = []
         index_list = []
-        # num_timesteps = 2000
-        # num_samples = 2000
         while step < self.steps:
             x, out_dict = next(self.train_iter)
             index_list.append(out_dict)
             out_dict = {"y": out_dict}
             x = x.to(self.device)
-            t_list = torch.linspace(0, 50, steps=50, dtype=torch.int64).to(self.device)
-            # t_list = torch.Tensor([30]).to(self.device).long()
+            t_list = torch.linspace(0, gradient_settings["step_range"], steps=gradient_settings["num_step"], dtype=torch.int64).to(self.device)
             gradients_l2_list = []
             for k in out_dict:
                 out_dict[k] = out_dict[k].long().to(self.device)
@@ -139,11 +134,7 @@ class Trainer:
                 loss = loss_multi + loss_gauss
                 loss.backward(retain_graph=True)
                 inner_gradient = []
-                # for p in self.diffusion._denoise_fn.parameters():
-                #     print(p.grad)
-                #     inner_gradient.append(torch.norm(p.grad).unsqueeze(0))
                 for p in self.diffusion._denoise_fn.parameters():
-                   
                     if p.requires_grad and p.grad is not None:
                         
                         grad_flat = p.grad.view(-1)
@@ -177,13 +168,8 @@ class Trainer:
                 
                 temp_gradient_list = torch.cat(inner_gradient).flatten().unsqueeze(0)       
                 self.optimizer.zero_grad()
-                # print(temp_gradient_list.shape)
                 gradients_l2_list.append(temp_gradient_list)
-            # return torch.cat(gradients_l2_list).unsqueeze(0)
-            # print(torch.stack(gradients_l2_list).shape)
-            # return torch.stack(gradients_l2_list).mean(dim=0).unsqueeze(0)
-            gradient_list.append(torch.stack(gradients_l2_list).unsqueeze(0))
-
-            # gradient_list.append(torch.cat(gradients_l2_list).unsqueeze(0))
+            # print(torch.stack(gradients_l2_list).squeeze(0).mean(dim=0).shape)
+            gradient_list.append(torch.stack(gradients_l2_list).squeeze(0).mean(dim=0))
             step += 1
         return gradient_list, index_list

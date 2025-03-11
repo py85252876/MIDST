@@ -14,6 +14,9 @@ sys.modules['midst_competition.single_table_ClavaDDPM.tab_ddpm.gaussian_multinom
 
 from midst_models.single_table_TabDDPM.pipeline_modules import *
 
+import midst_models
+print("midst_models path:", midst_models.__file__)
+
 import os
 
 import pickle
@@ -24,6 +27,7 @@ import torch
 import torch.nn as nn
 import torch.utils.data
 
+import fire
         
     
 def reorder_columns(df, column_orders):
@@ -45,7 +49,6 @@ def prepare_dataset(base_dir, column_orders):
 
     challenge_set = challenge_with_id.drop(columns=["trans_id", "account_id", "is_train"])
     challenge_set = reorder_columns(challenge_set,column_orders)
-    # print(column_orders)
     challenge_set = challenge_set.drop(columns=["placeholder"])
 
     is_train = torch.tensor(is_train.values).T
@@ -66,11 +69,15 @@ def load_pretrained(relation_order, save_dir):
 
     return models
 
-def main(relation_order = None, save_dir = None):
-    relation_order = [[None, "trans"]]
-    base_dir = "./tabddpm_white_box/train" 
+def main(
+    relation_order: list = [[None, "trans"]],
+    base_dir: str = "./tabddpm_white_box/train",
+    step_range: int = 50,
+    num_step: int = 20
+):
     all_train_set = []
     all_is_train = []
+    gradient_settings = {"step_range": step_range, "num_step": num_step}
     for i in range(1, 31):
         save_dir = os.path.join(base_dir, f"tabddpm_{i}")
         pretrained_model = load_pretrained(relation_order, save_dir)
@@ -82,7 +89,7 @@ def main(relation_order = None, save_dir = None):
         train_set, is_train = prepare_dataset(save_dir, pretrained_model["column_orders"])
         for parent, child in relation_order:
             train_result, _ = get_model_gradient(
-                train_set, parent, child, pretrained_model,num_transform,label_encoder
+                train_set, parent, child, pretrained_model,num_transform,label_encoder, gradient_settings
             )
         all_train_set.append(torch.stack(train_result).squeeze())
         all_is_train.append(is_train)
@@ -97,4 +104,4 @@ def main(relation_order = None, save_dir = None):
 
 
 if __name__ == "__main__":
-    main()
+    fire.Fire(main)

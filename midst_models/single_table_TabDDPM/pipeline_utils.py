@@ -534,6 +534,7 @@ def model_gradient(
     pretrained_model,
     num_transform,
     labels_encoder,
+    gradient_settings,
     device="cuda",
 ):
     T = Transformations(**T_dict)
@@ -564,7 +565,7 @@ def model_gradient(
         steps=dataset.X_num["train"].shape[0]//1,
         device=device,
     )
-    return trainer.gradient_loop()
+    return trainer.gradient_loop(gradient_settings = gradient_settings)
 
 
 def train_model(

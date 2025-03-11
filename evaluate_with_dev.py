@@ -5,6 +5,7 @@ from sklearn import preprocessing
 import sys
 import csv
 import xgboost as xgb
+import fire
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
@@ -75,14 +76,9 @@ def reorder_columns(df, column_orders):
 
 def prepare_dataset(base_dir, column_orders):
     challenge_with_id = pd.read_csv(os.path.join(base_dir, "challenge_with_id.csv"))
-    # is_train = pd.read_csv(os.path.join(base_dir, "challenge_label.csv"))  # 只有 is_train 列
-    
-    # challenge_with_id["is_train"] = is_train["is_train"]
     challenge_set = challenge_with_id.drop(columns=["trans_id", "account_id"])
     
     challenge_set = reorder_columns(challenge_set,column_orders)
-    # 转换 is_train 为张量
-    # is_train = torch.tensor(is_train.values).T
     challenge_set = challenge_set.drop(columns=["placeholder"])
 
     return challenge_set
@@ -101,13 +97,19 @@ def load_pretrained(relation_order, save_dir):
 
     return models
 
-def main(relation_order = None, save_dir = None):
-    relation_order = [[None, "trans"]]
-    base_dir = "./tabddpm_white_box/dev" 
+def main(
+    relation_order: list = [[None, "trans"]],
+    best_model: str = "./best_model.pth",
+    step_range: int = 50,
+    num_step: int = 20
+):
+    gradient_settings = {"step_range": step_range, "num_step": num_step}
     classifier = ClassificationModel(200)
-    classifier.load_state_dict(torch.load("./best_classification_model.pth"))
+    classifier.load_state_dict(torch.load(best_model))
     scaler = joblib.load("./scaler.pkl")
     classifier.eval()
+
+    base_dir = "./tabddpm_white_box/dev"
 
     for i in range(31, 41):
         save_dir = os.path.join(base_dir, f"tabddpm_{i}")
@@ -121,7 +123,7 @@ def main(relation_order = None, save_dir = None):
         
         for parent, child in relation_order:
             test_result, _ = get_model_gradient(
-                test_set, parent, child, pretrained_model,num_transform,label_encoder
+                test_set, parent, child, pretrained_model,num_transform,label_encoder,gradient_settings
             )
         calculate_acc(classifier, scaler, torch.stack(test_result).detach().cpu().squeeze(), save_dir)
 
@@ -137,7 +139,7 @@ def main(relation_order = None, save_dir = None):
         for parent, child in relation_order:
 
             test_result, _ = get_model_gradient(
-                test_set, parent, child, pretrained_model,num_transform,label_encoder
+                test_set, parent, child, pretrained_model,num_transform,label_encoder,gradient_settings
             )
         calculate_acc(classifier, scaler, torch.stack(test_result).detach().cpu().squeeze(), save_dir)
 
@@ -154,7 +156,7 @@ def main(relation_order = None, save_dir = None):
         num_transform = pretrained_model["inverse_transform"].__self__
         for parent, child in relation_order:
             test_result, _ = get_model_gradient(
-                test_set, parent, child, pretrained_model,num_transform,label_encoder
+                test_set, parent, child, pretrained_model,num_transform,label_encoder,gradient_settings
             )
         calculate_acc(classifier, scaler, torch.stack(test_result).detach().cpu().squeeze(), save_dir)
         
@@ -170,7 +172,7 @@ def main(relation_order = None, save_dir = None):
         for parent, child in relation_order:
 
             test_result, _ = get_model_gradient(
-                test_set, parent, child, pretrained_model,num_transform,label_encoder
+                test_set, parent, child, pretrained_model,num_transform,label_encoder,gradient_settings
             )
         calculate_acc(classifier, scaler, torch.stack(test_result).detach().cpu().squeeze(), save_dir)
         
@@ -182,6 +184,6 @@ def main(relation_order = None, save_dir = None):
 
 
 if __name__ == "__main__":
-    main()
+    fire.Fire(main)
 
 

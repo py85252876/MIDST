@@ -135,7 +135,7 @@ def child_training(
     return child_result
 
 def get_model_gradient(
-    child_df_with_cluster, parent_name, child_name, pretrained_model, num_transform, labels_encoder
+    child_df_with_cluster, parent_name, child_name, pretrained_model, num_transform, labels_encoder, gradient_settings
 ):
     if parent_name is None:
         child_df_with_cluster["placeholder"] = list(range(len(child_df_with_cluster)))
@@ -149,7 +149,8 @@ def get_model_gradient(
         pretrained_model["T_dict"],
         pretrained_model,
         num_transform,
-        labels_encoder
+        labels_encoder,
+        gradient_settings
     )
 
 
