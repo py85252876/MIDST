@@ -36,7 +36,7 @@ pip install -r requirements.txt
 
 ## Attack Process
 
-1. **Extract gradients**: Run `get_gradients.py` to extract gradient data from the models trained on the `train` path for both member and non-member samples. 
+1. **Extract gradients**: Run [`get_gradients.py`](get_gradients.py) to extract gradient data from the models trained on the `train` path for both member and non-member samples. 
 
 - This script will save the gradient data to `train_data.pt` and the corresponding labels to `train_label.pt`.
 - The parameter `step_range` controls the range of steps from which gradients are collected.
@@ -47,13 +47,13 @@ pip install -r requirements.txt
     python get_gradients.py --step_range 20 --num_step 20 
     ```
 
-2. **Train the attack model**: Run `train_model.py` to train a classification model (the attack model) on the extracted gradient data. This script will log scalars and save checkpoints that achieve both train accuracy and test accuracy above 0.70. The user can also set the batch size, train test set ratio, and number of epochs.
+2. **Train the attack model**: Run [`train_model.py`](train_model.py) to train a classification model (the attack model) on the extracted gradient data. This script will log scalars and save checkpoints that achieve both train accuracy and test accuracy above 0.70. The user can also set the batch size, train test set ratio, and number of epochs.
 
     ```bash
     python train_model.py --batch_size 1024 --test_size 0.2 --num_epochs 5000
     ```
 
-3. **Evaluate on dev and final**: Run `evaluate_with_dev.py` to load the best-performing attack model and the corresponding scalar, then apply it to the models in the `dev` and `final` paths, generating `prediction.csv`. The `step_range` and `num_step` are aligned with the hyper-parameters within the **extract gradients**, and `best_model` is used to select the best attack model (trained from the data from shadow models).
+3. **Evaluate on dev and final**: Run [`evaluate_with_dev.py`](evaluate_with_dev.py) to load the best-performing attack model and the corresponding scalar, then apply it to the models in the `dev` and `final` paths, generating `prediction.csv`. The `step_range` and `num_step` are aligned with the hyper-parameters within the **extract gradients**, and `best_model` is used to select the best attack model (trained from the data from shadow models).
 
     ```bash
     python evaluate_with_dev.py --step_range 20 --num_step 20 --best_model "./best_classification_model.pth"
