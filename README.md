@@ -19,7 +19,7 @@ The solution contains the following steps:
 My solution does not require additional packages. You can fully follow the environment setup process from the original repository, or you can also use the [requirements.txt](requirements.txt) file:
 
 ```bash
-
+pip install -r requirements.txt
 ```
 
 1. Clone the original [GitHub repository](https://github.com/VectorInstitute/MIDSTModels) to your local environment.
